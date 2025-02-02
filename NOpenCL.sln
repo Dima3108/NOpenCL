@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26621.2
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NOpenCL", "NOpenCL\NOpenCL.csproj", "{C94F61DD-9361-4B1F-B1A8-DAD72BD6FD51}"
 EndProject
@@ -24,6 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{47E2DAA8
 		build\appveyor-install.ps1 = build\appveyor-install.ps1
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CL_Test", "CL_Test\CL_Test.csproj", "{EDAED4BB-BD6E-4FFB-8677-5D59AF341C1E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{E3049450-381D-42F5-AB04-16628C8C85BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3049450-381D-42F5-AB04-16628C8C85BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3049450-381D-42F5-AB04-16628C8C85BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDAED4BB-BD6E-4FFB-8677-5D59AF341C1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDAED4BB-BD6E-4FFB-8677-5D59AF341C1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDAED4BB-BD6E-4FFB-8677-5D59AF341C1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDAED4BB-BD6E-4FFB-8677-5D59AF341C1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

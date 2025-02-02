@@ -29,7 +29,19 @@ namespace NOpenCL
             _device = device;
             _handle = handle;
         }
-
+        #region MY_CODE
+        public static implicit operator Device(int i)
+        {
+            var Platforms = Platform.GetPlatforms();
+            List<Device> devices = new List<Device>();
+            foreach (var p in Platforms)
+            {
+                foreach(var d in p.GetDevices())
+                    devices.Add(d);
+            }
+            return devices[i % devices.Count];
+        }
+        #endregion
         /// <summary>
         /// The default compute device address space size specified as an unsigned integer
         /// value in bits. Currently supported values are 32 or 64 bits.

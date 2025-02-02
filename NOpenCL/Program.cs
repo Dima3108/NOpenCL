@@ -155,7 +155,9 @@ namespace NOpenCL
         {
             Build(null, options);
         }
-
+        #region MY_CODE
+        public void Build(Device device) => Build(new Device[] { device });
+        #endregion
         public void Build(Device[] devices)
         {
             Build(devices, null);

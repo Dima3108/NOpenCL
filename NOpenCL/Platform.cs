@@ -8,6 +8,13 @@ namespace NOpenCL
 
     public sealed class Platform : IEquatable<Platform>
     {
+        #region MY_CODE
+        public static implicit operator Platform(int i)
+        {
+            Platform[]platforms=Platform.GetPlatforms();
+            return platforms[i % platforms.Length];
+        }
+        #endregion
         private readonly UnsafeNativeMethods.ClPlatformID _platform;
 
         private Platform(UnsafeNativeMethods.ClPlatformID platform)
