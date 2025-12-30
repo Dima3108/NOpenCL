@@ -1,0 +1,5 @@
+ dotnet publish .\NOpenCL.csproj -c Release -p:PublishSingleFile=true --self-contained true --framework net50  -r win-x64
+
+
+
+  публикация в одном файле поддерживается только для исполняемых приложений.

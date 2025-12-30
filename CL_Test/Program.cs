@@ -1,13 +1,16 @@
-﻿using NOpenCL;
+﻿#pragma warning disable NETSDK1138
+using NOpenCL;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Buffer = NOpenCL.Buffer;
+
 namespace CL_Test
 {
     internal class Program
     {
         const string kernel_name = "kernel.cl";
         const int N = 1024 * 1024 * 256;
-        static unsafe void TestAllocatedHostPointer(int* hostbuffer,Device device, Context context, string kernel_code, string c_name)
+        static unsafe void TestAllocatedHostPointer(int* hostbuffer, Device device, Context context, string kernel_code, string c_name)
         {
             int* h = null;
             Buffer buffer = context.CreateBuffer(MemoryFlags.AllocateHostPointer | MemoryFlags.ReadWrite, sizeof(int) * N, (IntPtr)h);
@@ -38,10 +41,12 @@ namespace CL_Test
             commandQueue.EnqueueUnmapMemObject(buffer, mappedPointer);
             buffer.Dispose();
         }
-        static unsafe void TestUsedHostMemory(int* hostbuffer, Device device, Context context, string kernel_code, string c_name)
+        static unsafe void TestUsedMemory(int* hostbuffer, Device device, Context context, string kernel_code, string c_name, bool useHostMem = true)
         {
-
-            Buffer buffer = context.CreateBuffer(MemoryFlags.UseHostPointer | MemoryFlags.ReadWrite, sizeof(int) * N, (IntPtr)hostbuffer);
+            MemoryFlags buf_mem_flags = MemoryFlags.ReadWrite;
+            if (useHostMem)
+                buf_mem_flags |= MemoryFlags.UseHostPointer;
+            Buffer buffer = context.CreateBuffer(buf_mem_flags, sizeof(int) * N, (IntPtr)hostbuffer);
             CommandQueue commandQueue = context.CreateCommandQueue(device);
             NOpenCL.Program program = context.CreateProgramWithSource(kernel_code);
             program.Build(device);
@@ -56,7 +61,8 @@ namespace CL_Test
             commandQueue.Finish();
             Console.WriteLine(hostbuffer[20]);
             Console.WriteLine(hostbuffer[35] == 35 * 35);
-            buffer.Dispose();
+            NOpenCL.CleanUp.ForcedResourceCleanup.Clear(ref buffer);
+            //  buffer.Dispose();
         }
         static unsafe void Main(string[] args)
         {
@@ -72,7 +78,14 @@ namespace CL_Test
             Context context = Context.Create(device);
 
             //TestAllocatedHostPointer(hostbuffer, device, context, kernel_code, c_name);
-            TestUsedHostMemory(hostbuffer, device, context, kernel_code, c_name);
+            Console.WriteLine("host");
+            TestUsedMemory(hostbuffer, device, context, kernel_code, c_name);
+            Parallel.For(0, N, i =>
+           {
+               hostbuffer[i] = i;
+           });
+            Console.WriteLine("device");
+            TestUsedMemory(hostbuffer, device, context, kernel_code, c_name);
             Marshal.FreeCoTaskMem((IntPtr)hostbuffer);
             //Marshal.FreeCoTaskMem((IntPtr)hostbuf2);
         }

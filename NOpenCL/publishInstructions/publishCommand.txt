@@ -1,0 +1,1 @@
+ dotnet publish .\NOpenCL.csproj -c Release --self-contained true --framework net50 -r linux-x64 -r win-x64
