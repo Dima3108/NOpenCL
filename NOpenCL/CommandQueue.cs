@@ -5,6 +5,7 @@ namespace NOpenCL
 {
     using System;
     using System.ComponentModel;
+    using System.Runtime.InteropServices;
     using NOpenCL.SafeHandles;
 
     public sealed class CommandQueue : IDisposable
@@ -106,7 +107,23 @@ namespace NOpenCL
             EventSafeHandle handle = UnsafeNativeMethods.EnqueueReadBuffer(Handle, buffer.Handle, blocking, (IntPtr)offset, (IntPtr)size, destination, eventHandles);
             return new Event(handle);
         }
-
+        #region  MYCODE
+        public Event EnqueueReadBuffer<T>(Buffer buffer, T[] array, long offset, long size)
+        {
+            unsafe
+            {
+                fixed (T* a = array)
+                {
+                    IntPtr pt = (IntPtr)a;
+                    return EnqueueReadBuffer(buffer, true, offset, size, pt);
+                }
+            }
+        }
+        public Event EnqueueReadBuffer<T>(Buffer buffer, T[] array)
+        {
+            return EnqueueReadBuffer(buffer, array, 0, Marshal.SizeOf(typeof(T)) * array.Length);
+        }
+        #endregion
         public Event EnqueueReadBufferRect(Buffer buffer, bool blocking, BufferCoordinates bufferOrigin, BufferCoordinates hostOrigin, BufferSize region, long bufferRowPitch, long bufferSlicePitch, long hostRowPitch, long hostSlicePitch, IntPtr destination, params Event[] eventWaitList)
         {
             EventSafeHandle[] eventHandles = null;
@@ -126,6 +143,23 @@ namespace NOpenCL
             EventSafeHandle handle = UnsafeNativeMethods.EnqueueWriteBuffer(Handle, buffer.Handle, blocking, (IntPtr)offset, (IntPtr)size, source, eventHandles);
             return new Event(handle);
         }
+        #region  MYCODE
+        public Event EnqueueWriteBuffer<T>(Buffer buffer, T[] array, long offset, long size)
+        {
+            unsafe
+            {
+                fixed (T* a = array)
+                {
+                    IntPtr pt = (IntPtr)a;
+                    return EnqueueWriteBuffer(buffer, true, offset, size, pt);
+                }
+            }
+        }
+        public Event EnqueueWriteBuffer<T>(Buffer buffer, T[] array)
+        {
+            return EnqueueWriteBuffer(buffer, array, 0, Marshal.SizeOf(typeof(T)) * array.Length);
+        }
+        #endregion
 
         public Event EnqueueWriteBufferRect(Buffer buffer, bool blocking, BufferCoordinates bufferOrigin, BufferCoordinates hostOrigin, BufferSize region, long bufferRowPitch, long bufferSlicePitch, long hostRowPitch, long hostSlicePitch, IntPtr source, params Event[] eventWaitList)
         {

@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;net50</TargetFrameworks>
+    <TargetFrameworks>net80;net50</TargetFrameworks>
     <EnableDefaultNoneItems>False</EnableDefaultNoneItems>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <NoWarn>$(NoWarn);1591</NoWarn>

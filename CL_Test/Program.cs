@@ -41,27 +41,30 @@ namespace CL_Test
             commandQueue.EnqueueUnmapMemObject(buffer, mappedPointer);
             buffer.Dispose();
         }
-        static unsafe void TestUsedMemory(int* hostbuffer, Device device, Context context, string kernel_code, string c_name, bool useHostMem = true)
+        static unsafe void TestUsedMemory(int[] hostbuffer, Device device, Context context, string kernel_code, string c_name, bool useHostMem = true)
         {
-            MemoryFlags buf_mem_flags = MemoryFlags.ReadWrite;
-            if (useHostMem)
-                buf_mem_flags |= MemoryFlags.UseHostPointer;
-            Buffer buffer = context.CreateBuffer(buf_mem_flags, sizeof(int) * N, (IntPtr)hostbuffer);
-            CommandQueue commandQueue = context.CreateCommandQueue(device);
-            NOpenCL.Program program = context.CreateProgramWithSource(kernel_code);
-            program.Build(device);
-            Console.ReadLine();
-            using (Kernel kernel = program.CreateKernel(c_name))
+            fixed (int* h = hostbuffer)
             {
-                kernel.Arguments[0].SetValue(buffer);
-                commandQueue.EnqueueNDRangeKernel(kernel, (IntPtr)N, (IntPtr)4);
+                MemoryFlags buf_mem_flags = MemoryFlags.ReadWrite;
+                if (useHostMem)
+                    buf_mem_flags |= MemoryFlags.UseHostPointer;
+                Buffer buffer = context.CreateBuffer(buf_mem_flags, sizeof(int) * N, (IntPtr)h);
+                CommandQueue commandQueue = context.CreateCommandQueue(device);
+                NOpenCL.Program program = context.CreateProgramWithSource(kernel_code);
+                program.Build(device);
+                Console.ReadLine();
+                using (Kernel kernel = program.CreateKernel(c_name))
+                {
+                    kernel.Arguments[0].SetValue(buffer);
+                    commandQueue.EnqueueNDRangeKernel(kernel, (IntPtr)N, (IntPtr)4);
+                    commandQueue.Finish();
+                }
+                commandQueue.EnqueueReadBuffer(buffer, hostbuffer);
                 commandQueue.Finish();
+                Console.WriteLine(hostbuffer[20]);
+                Console.WriteLine(hostbuffer[35] == 35 * 35);
+                NOpenCL.CleanUp.ForcedResourceCleanup.Clear(ref buffer);
             }
-            commandQueue.EnqueueReadBuffer(buffer, true, 0, sizeof(int) * N, (IntPtr)hostbuffer);
-            commandQueue.Finish();
-            Console.WriteLine(hostbuffer[20]);
-            Console.WriteLine(hostbuffer[35] == 35 * 35);
-            NOpenCL.CleanUp.ForcedResourceCleanup.Clear(ref buffer);
             //  buffer.Dispose();
         }
         static unsafe void Main(string[] args)
@@ -69,7 +72,8 @@ namespace CL_Test
             string kernel_code = System.IO.File.ReadAllText(kernel_name);
             const string c_name = "test";
             Device device = 0;
-            int* hostbuffer = (int*)Marshal.AllocCoTaskMem(N * sizeof(int));
+            //  int* hostbuffer = (int*)Marshal.AllocCoTaskMem(N * sizeof(int));
+            int[] hostbuffer = new int[N];
             Parallel.For(0, N, i =>
             {
                 hostbuffer[i] = i;
@@ -86,7 +90,7 @@ namespace CL_Test
            });
             Console.WriteLine("device");
             TestUsedMemory(hostbuffer, device, context, kernel_code, c_name);
-            Marshal.FreeCoTaskMem((IntPtr)hostbuffer);
+            //  Marshal.FreeCoTaskMem((IntPtr)hostbuffer);
             //Marshal.FreeCoTaskMem((IntPtr)hostbuf2);
         }
     }
